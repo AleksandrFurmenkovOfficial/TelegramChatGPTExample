@@ -75,8 +75,10 @@ namespace TelegramChatGPTExample
         private static void ClearMemoryCommand(Message message)
         {
             var chatId = message.Chat.Id;
-            var chatContext = TelegramChatGPTExample.contextByChats[chatId];
-            chatContext.ReInitialize();
+            if (TheAIFellowBot.contextByChats.TryGetValue(chatId, out var chatContext))
+            {
+                chatContext.ReInitialize();
+            }
 
             _ = TelegramChatGPTExample.Bot.SendMessage(new SendMessage
             {
