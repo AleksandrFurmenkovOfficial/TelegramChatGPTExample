@@ -70,9 +70,11 @@ namespace TelegramChatGPTExample
             var me = await Bot.GetMe();
             Console.WriteLine($"Bot name: @{me.Username}");
 
-            var messageListener = Bot.Updates.Message.Subscribe(HandleMessage, exception =>
+            var messageListener = Bot.Updates.Message.Subscribe(HandleMessage, async exception =>
             {
-                Console.WriteLine($"An error has occured: {exception.Message}");
+                await Task.Delay(1000).ConfigureAwait(false);
+                ReportIssue(exception.Message);
+                _ = Run(attempt);
             });
 
             _ = Console.ReadLine();
@@ -102,7 +104,7 @@ namespace TelegramChatGPTExample
                     return;
 
                 bool isPersonalChat = chatId == message.From.Id;
-                bool isExplicitAICall = !isPersonalChat && message.Text.StartsWith(groupChatPrefix);
+                bool isExplicitAICall = !isPersonalChat && message.Text.StartsWith("-");
                 if (isPersonalChat || isExplicitAICall)
                 {
                     var chatContext = contextByChats.GetOrAdd(chatId, new AIChatContext());
@@ -112,8 +114,7 @@ namespace TelegramChatGPTExample
                     {
                         var conversation = chatContext.GetConversation(() => { return AI.Chat.CreateConversation(); });
                         conversation.AppendMessage(new ChatMessage(ChatMessageRole.User, message.Text));
-                        response = await conversation.GetResponseFromChatbot();
-
+                        response = await conversation.GetResponseFromChatbotAsync().ConfigureAwait(false);
                     }
                     finally
                     {
@@ -138,7 +139,27 @@ namespace TelegramChatGPTExample
                         Text = "Allowed dialogue length exceeded, press (Re)start in the menu (left striped button) to start a new dialogue."
                     });
                 }
+                else 
+                {
+                    ReportIssue(exception.Message);
+                }
             }
+        }
+
+        private static void ReportIssue(string message)
+        {
+            try
+            {
+                Console.WriteLine(message);
+                _ = Bot.SendMessage(new SendMessage
+                {
+                    ChatId = adminId,
+                    Text = message
+                });
+            }
+            catch (Exception)
+            {
+            }            
         }
 
         public static bool IsAdmin(Message message)
