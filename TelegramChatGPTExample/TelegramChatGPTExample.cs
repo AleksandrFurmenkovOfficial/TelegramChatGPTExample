@@ -72,6 +72,7 @@ namespace TelegramChatGPTExample
 
             var messageListener = Bot.Updates.Message.Subscribe(HandleMessage, async exception =>
             {
+                Console.WriteLine($"An error has occured: {exception.Message}");
                 await Task.Delay(1000).ConfigureAwait(false);
                 ReportIssue(exception.Message);
                 _ = Run(attempt);
@@ -104,7 +105,7 @@ namespace TelegramChatGPTExample
                     return;
 
                 bool isPersonalChat = chatId == message.From.Id;
-                bool isExplicitAICall = !isPersonalChat && message.Text.StartsWith("-");
+                bool isExplicitAICall = !isPersonalChat && message.Text.StartsWith(groupChatPrefix);
                 if (isPersonalChat || isExplicitAICall)
                 {
                     var chatContext = contextByChats.GetOrAdd(chatId, new AIChatContext());
