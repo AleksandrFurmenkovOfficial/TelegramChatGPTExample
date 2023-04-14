@@ -1,4 +1,4 @@
-﻿using OpenAI_API;
+using OpenAI_API;
 using OpenAI_API.Chat;
 using RxTelegram.Bot.Interface.BaseTypes;
 using RxTelegram.Bot.Interface.BaseTypes.Requests.Messages;
@@ -10,22 +10,6 @@ using System.Threading.Tasks;
 
 namespace TelegramChatGPTExample
 {
-    internal class APIUsageException : Exception
-    {
-        public long chatId;
-        public APIUsageException(string message, long chatId) : base(message)
-        {
-            this.chatId = chatId;
-        }
-    }
-
-    internal class ContextSizeExceededException : APIUsageException
-    {
-        public ContextSizeExceededException(string message, long chatId) : base(message, chatId)
-        {
-        }
-    }
-
     internal class Visitor
     {
         public bool access;
@@ -68,14 +52,14 @@ namespace TelegramChatGPTExample
         private static async Task Run(int attempt = 0)
         {
             var me = await Bot.GetMe();
-            Console.WriteLine($"Bot name: @{me.Username}");
+            Console.WriteLine($"Bot name: @{me.Username}; Run attempt {attempt}");
 
             var messageListener = Bot.Updates.Message.Subscribe(HandleMessage, async exception =>
             {
                 Console.WriteLine($"An error has occured: {exception.Message}");
                 await Task.Delay(1000).ConfigureAwait(false);
                 ReportIssue(exception.Message);
-                _ = Run(attempt);
+                _ = Run(attempt + 1);
             });
 
             _ = Console.ReadLine();
@@ -131,7 +115,7 @@ namespace TelegramChatGPTExample
             }
             catch (Exception exception)
             {
-                var contextLimitTag = "This model's maximum context length is";
+                const string contextLimitTag = "This model's maximum context length is";
                 if (exception.Message.Contains(contextLimitTag))
                 {
                     _ = Bot.SendMessage(new SendMessage
