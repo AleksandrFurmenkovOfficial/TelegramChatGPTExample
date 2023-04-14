@@ -51,7 +51,7 @@ namespace TelegramChatGPTExample
             {
                 ChatId = chatId,
                 Text = vis
-            }).ConfigureAwait(false);
+            });
         }
 
         private static void AddAccess(Message message)
@@ -84,7 +84,7 @@ namespace TelegramChatGPTExample
             {
                 ChatId = chatId,
                 Text = "The dialogue is cleared for AI"
-            }).ConfigureAwait(false);
+            });
         }
     }
 }
