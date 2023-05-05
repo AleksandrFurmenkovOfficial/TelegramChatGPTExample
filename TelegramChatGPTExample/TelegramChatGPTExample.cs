@@ -52,14 +52,13 @@ namespace TelegramChatGPTExample
         private static async Task Run(int attempt = 0)
         {
             var me = await Bot.GetMe();
-            Console.WriteLine($"Bot name: @{me.Username}; Run attempt {attempt}");
+            Console.WriteLine($"Bot name: @{me.Username}");
 
             var messageListener = Bot.Updates.Message.Subscribe(HandleMessage, async exception =>
             {
-                Console.WriteLine($"An error has occured: {exception.Message}");
                 await Task.Delay(1000).ConfigureAwait(false);
                 ReportIssue(exception.Message);
-                _ = Run(attempt + 1);
+                _ = Run(attempt);
             });
 
             _ = Console.ReadLine();
@@ -89,15 +88,17 @@ namespace TelegramChatGPTExample
                     return;
 
                 bool isPersonalChat = chatId == message.From.Id;
-                bool isExplicitAICall = !isPersonalChat && message.Text.StartsWith(groupChatPrefix);
+                bool isExplicitAICall = !isPersonalChat && message.Text.StartsWith("-");
                 if (isPersonalChat || isExplicitAICall)
                 {
                     var chatContext = contextByChats.GetOrAdd(chatId, new AIChatContext());
+                    var conversation = await chatContext.GetConversation(() => { return AI.Chat.CreateConversation(); }).ConfigureAwait(false);
+
                     await chatContext.conversationSemaphore.WaitAsync();
+
                     string response = "";
                     try
                     {
-                        var conversation = chatContext.GetConversation(() => { return AI.Chat.CreateConversation(); });
                         conversation.AppendMessage(new ChatMessage(ChatMessageRole.User, message.Text));
                         response = await conversation.GetResponseFromChatbotAsync().ConfigureAwait(false);
                     }
@@ -115,13 +116,13 @@ namespace TelegramChatGPTExample
             }
             catch (Exception exception)
             {
-                const string contextLimitTag = "This model's maximum context length is";
+                var contextLimitTag = "This model's maximum context length is";
                 if (exception.Message.Contains(contextLimitTag))
                 {
                     _ = Bot.SendMessage(new SendMessage
                     {
                         ChatId = chatId,
-                        Text = "Allowed dialogue length exceeded, press (Re)start in the menu (left striped button) to start a new dialogue."
+                        Text = "Allowed dialogue length exceeded, press (Re)start in the menu (left striped button) to start a new dialogue.""
                     });
                 }
                 else 
