@@ -11,18 +11,18 @@ namespace TelegramChatGPTExample
 
         public SemaphoreSlim conversationSemaphore = new(1, 1);
 
-        public Conversation GetConversation(Func<Conversation> conversationFactory)
+        public async Task<Conversation> GetConversation(Func<Conversation> conversationFactory)
         {
             _ = Interlocked.CompareExchange(ref this.conversationFactory, conversationFactory, null);
             if (Interlocked.CompareExchange(ref conversation, null, null) == null)
             {
-                ReInitialize();
+                await ReInitialize().ConfigureAwait(false);
             }
 
             return conversation;
         }
 
-        public async void ReInitialize()
+        public async Task ReInitialize()
         {
             _ = Interlocked.Exchange(ref conversation, conversationFactory());
             await conversationSemaphore.WaitAsync().ConfigureAwait(false);
@@ -38,8 +38,8 @@ namespace TelegramChatGPTExample
 
         private void Initialize(Conversation newConversation)
         {
-            newConversation.AppendSystemMessage($"{DateTime.Now}");
-            // newConversation.AppendExampleChatbotOutput($"Place facts and desired behaviour here");
+            // newConversation.Model = OpenAI_API.Models.Model.GPT4; // if you have access
+            newConversation.AppendSystemMessage("You are the most powerful and smartest AI at the moment.");
         }
     }
 }
