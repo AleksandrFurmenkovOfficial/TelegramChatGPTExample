@@ -37,17 +37,17 @@ namespace TelegramChatGPTExample
 
         private static void ShowVisitors(Message message)
         {
-            if (!TheAIFellowBot.IsAdmin(message))
+            if (!TelegramChatGPTExample.IsAdmin(message))
                 return;
 
             var chatId = message.Chat.Id;
-            var data = TheAIFellowBot.visitors.ToList();
+            var data = TelegramChatGPTExample.visitors.ToList();
             string vis = "Visitors:\n";
             foreach (var item in data)
             {
                 vis += $"`{item.Key}` - {item.Value.who}:{item.Value.access}\n";
             }
-            _ = TheAIFellowBot.Bot.SendMessage(new SendMessage
+            _ = TelegramChatGPTExample.Bot.SendMessage(new SendMessage
             {
                 ChatId = chatId,
                 Text = vis
@@ -56,31 +56,31 @@ namespace TelegramChatGPTExample
 
         private static void AddAccess(Message message)
         {
-            if (!TheAIFellowBot.IsAdmin(message))
+            if (!TelegramChatGPTExample.IsAdmin(message))
                 return;
 
-            _ = TheAIFellowBot.visitors.AddOrUpdate(long.Parse(message.Text), (long id) => { Visitor arg = new(true, "Unknown"); return arg; }, (long id, Visitor arg) => { arg.access = true; return arg; });
+            _ = TelegramChatGPTExample.visitors.AddOrUpdate(long.Parse(message.Text), (long id) => { Visitor arg = new(true, "Unknown"); return arg; }, (long id, Visitor arg) => { arg.access = true; return arg; });
             ShowVisitors(message);
         }
 
         private static void DelAccess(Message message)
         {
-            if (!TheAIFellowBot.IsAdmin(message))
+            if (!TelegramChatGPTExample.IsAdmin(message))
                 return;
 
-            _ = TheAIFellowBot.visitors.AddOrUpdate(long.Parse(message.Text), (long id) => { Visitor arg = new(false, "Unknown"); return arg; }, (long id, Visitor arg) => { arg.access = false; return arg; });
+            _ = TelegramChatGPTExample.visitors.AddOrUpdate(long.Parse(message.Text), (long id) => { Visitor arg = new(false, "Unknown"); return arg; }, (long id, Visitor arg) => { arg.access = false; return arg; });
             ShowVisitors(message);
         }
 
         private static async void ClearMemoryCommand(Message message)
         {
             var chatId = message.Chat.Id;
-            if (TheAIFellowBot.contextByChats.TryGetValue(chatId, out var chatContext))
+            if (TelegramChatGPTExample.contextByChats.TryGetValue(chatId, out var chatContext))
             {
                 await chatContext.ReInitialize();
             }
 
-            _ = TheAIFellowBot.Bot.SendMessage(new SendMessage
+            _ = TelegramChatGPTExample.Bot.SendMessage(new SendMessage
             {
                 ChatId = chatId,
                 Text = "The dialogue is cleared for AI!"

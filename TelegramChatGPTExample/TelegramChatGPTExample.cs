@@ -122,7 +122,7 @@ namespace TelegramChatGPTExample
                     _ = Bot.SendMessage(new SendMessage
                     {
                         ChatId = chatId,
-                        Text = "Allowed dialogue length exceeded, press (Re)start in the menu (left striped button) to start a new dialogue.""
+                        Text = "Allowed dialogue length exceeded, press (Re)start in the menu (left striped button) to start a new dialogue."
                     });
                 }
                 else 

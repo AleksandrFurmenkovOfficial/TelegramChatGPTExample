@@ -1,6 +1,7 @@
 ﻿using OpenAI_API.Chat;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TelegramChatGPTExample
 {
