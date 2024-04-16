@@ -39,7 +39,7 @@ namespace TelegramChatGPTExample
 
         private void Initialize(Conversation newConversation)
         {
-            newConversation.Model = OpenAI_API.Models.Model.GPT4_Turbo;
+            newConversation.Model = "gpt-4-turbo";
             newConversation.AppendSystemMessage("You are the most powerful and smartest AI at the moment.");
         }
     }

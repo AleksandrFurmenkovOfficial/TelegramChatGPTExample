@@ -49,8 +49,11 @@ namespace TelegramChatGPTExample
             await Run();
         }
 
-        private static async Task Run(int attempt = 0)
+        private static async Task Run(int attempt = 3)
         {
+            if (attempt == 0)
+                return;
+
             var me = await Bot.GetMe();
             Console.WriteLine($"Bot name: @{me.Username}");
 
@@ -58,7 +61,7 @@ namespace TelegramChatGPTExample
             {
                 await Task.Delay(1000).ConfigureAwait(false);
                 ReportIssue(exception.Message);
-                _ = Run(attempt);
+                _ = Run(attempt - 1);
             });
 
             _ = Console.ReadLine();

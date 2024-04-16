@@ -19,8 +19,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenAI" Version="1.8.0" />
-    <PackageReference Include="RxTelegram.Bot" Version="6.9.1" />
+    <PackageReference Include="OpenAI" Version="1.11.0" />
+    <PackageReference Include="RxTelegram.Bot" Version="7.1.0" />
     <PackageReference Include="System.Reactive.Core" Version="6.0.0" />
   </ItemGroup>
 
