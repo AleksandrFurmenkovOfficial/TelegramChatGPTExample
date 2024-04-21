@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="OpenAI" Version="1.11.0" />
-    <PackageReference Include="RxTelegram.Bot" Version="7.1.0" />
+    <PackageReference Include="RxTelegram.Bot" Version="7.2.0" />
     <PackageReference Include="System.Reactive.Core" Version="6.0.0" />
   </ItemGroup>
 
